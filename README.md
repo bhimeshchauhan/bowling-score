@@ -19,6 +19,17 @@ Bowling
           /|
           / |
 
+### How to use
+
+- There are two ways to run this app
+
+#### Run via CLI
+
+- migrate to python file and run python python bowling.py <filepath> for e.g. `python bowling.py ../data/test.csv`
+
+### Application in React.JS and Django
+
+- Go to app folder and follow README.md in the folder
 
 ### Problem description
 Create a program, which, given a valid sequence of rolls for one line of American Ten-Pin Bowling, 
