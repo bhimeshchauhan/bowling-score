@@ -107,66 +107,66 @@ class Bowling(object):
             self.bowling_game(score_board)
             self.print_table(count)
 
-    def strike_frame_10(self, inputValues, s, inputLength):
-        if (s+2 < inputLength):
-            self.final_score_frame += self.cases[inputValues[s]] + self.cases[inputValues[s+1]] + self.cases[inputValues[s+2]]
-            if (inputValues[s+1] == '10'):
+    def strike_frame_10(self, inputValues, idx, inputLength):
+        if (idx+2 < inputLength):
+            self.final_score_frame += self.cases[inputValues[idx]] + self.cases[inputValues[idx+1]] + self.cases[inputValues[idx+2]]
+            if (inputValues[idx+1] == '10'):
                 score1 = 'X'
             else:
-                score1 = inputValues[s+1]
-            if (inputValues[s+2] == '10'):
+                score1 = inputValues[idx+1]
+            if (inputValues[idx+2] == '10'):
                 score2 = 'X'
             else:
-                score2 = inputValues[s+2]
+                score2 = inputValues[idx+2]
             self.table_content[self.frame_id]=('X', score1, score2, self.final_score_frame)
             self.frame_id += 1
         else:
             self.table_content[self.frame_id]=('X', '', '', self.final_score_frame)
             self.frame_id += 1
 
-    def strike(self, inputValues, s, inputLength):
+    def strike(self, inputValues, idx, inputLength):
         self.table_content[self.frame_id]=('X', ' ', ' ', self.final_score_frame)
-        if (s+2 < inputLength):
-            self.final_score_frame += self.cases[inputValues[s]] + self.cases[inputValues[s+1]] + self.cases[inputValues[s+2]]
+        if (idx+2 < inputLength):
+            self.final_score_frame += self.cases[inputValues[idx]] + self.cases[inputValues[idx+1]] + self.cases[inputValues[idx+2]]
             self.table_content[self.frame_id]=('X', ' ', ' ', self.final_score_frame)
             self.frame_id += 1
         else:
             self.table_content[self.frame_id]=('X', ' ', ' ', self.final_score_frame)
             self.frame_id += 1
         
-    def miss(self, inputValues, s, inputLength):
+    def miss(self, inputValues, idx, inputLength):
         # This means that this is the first throw of this frame
         if self.table_content[self.frame_id] == None:
-            self.table_content[self.frame_id]=(self.cases[inputValues[s]], ' ', ' ', self.final_score_frame)
+            self.table_content[self.frame_id]=(self.cases[inputValues[idx]], ' ', ' ', self.final_score_frame)
 
         else:
-            self.final_score_frame += self.cases[inputValues[s-1]] + self.cases[inputValues[s]]
-            self.table_content[frame_id]=(self.cases[inputValues[s-1]], self.cases[inputValues[s]], ' ', self.final_score_frame)
+            self.final_score_frame += self.cases[inputValues[idx-1]] + self.cases[inputValues[idx]]
+            self.table_content[frame_id]=(self.cases[inputValues[idx-1]], self.cases[inputValues[idx]], ' ', self.final_score_frame)
             self.frame_id += 1
 
-    def partial_hit(self, inputValues, s, inputLength):
-        self.table_content[self.frame_id]=(self.cases[inputValues[s]], ' ', ' ', self.final_score_frame)
+    def partial_hit(self, inputValues, idx, inputLength):
+        self.table_content[self.frame_id]=(self.cases[inputValues[idx]], ' ', ' ', self.final_score_frame)
 
-    def spare(self, inputValues, s, inputLength):
-        if self.cases[inputValues[s-1]] + self.cases[inputValues[s]] == 10:
-            self.final_score_frame += self.cases[inputValues[s-1]] + self.cases[inputValues[s]] + self.cases[inputValues[s+1]]
-            self.table_content[self.frame_id]=(self.cases[inputValues[s-1]], '/', ' ', self.final_score_frame)
+    def spare(self, inputValues, idx, inputLength):
+        if self.cases[inputValues[idx-1]] + self.cases[inputValues[idx]] == 10:
+            self.final_score_frame += self.cases[inputValues[idx-1]] + self.cases[inputValues[idx]] + self.cases[inputValues[idx+1]]
+            self.table_content[self.frame_id]=(self.cases[inputValues[idx-1]], '/', ' ', self.final_score_frame)
             self.frame_id += 1
-        elif self.cases[inputValues[s-1]] + self.cases[inputValues[s]] > 10:
+        elif self.cases[inputValues[idx-1]] + self.cases[inputValues[idx]] > 10:
             print( "Error: Looks like we have an extra pin in the roll, sorry!")
         else:
-            self.final_score_frame += self.cases[inputValues[s-1]] + self.cases[inputValues[s]]
-            self.table_content[self.frame_id]=(self.cases[inputValues[s-1]], self.cases[inputValues[s]], ' ', self.final_score_frame)
+            self.final_score_frame += self.cases[inputValues[idx-1]] + self.cases[inputValues[idx]]
+            self.table_content[self.frame_id]=(self.cases[inputValues[idx-1]], self.cases[inputValues[idx]], ' ', self.final_score_frame)
             self.frame_id += 1
 
-    def score(self, inputValues, s, inputLength):
+    def score(self, inputValues, idx, inputLength):
         # This means that this is the first throw of this frame
         if self.table_content[self.frame_id] == None:
-            self.partial_hit(inputValues, s, inputLength)
+            self.partial_hit(inputValues, idx, inputLength)
 
         else:
             # We have a spare!
-            self.spare(inputValues, s, inputLength)
+            self.spare(inputValues, idx, inputLength)
 
     def bowling_game(self, inputValues):
         # Read all the arguments after bowling-scoreboard.py <numbers>
@@ -183,20 +183,20 @@ class Bowling(object):
             # Then we have a game
             if inputLength > 0:
                 try:
-                    for s in range(0, inputLength):
+                    for idx in range(0, inputLength):
                         # We are under the limits of the game.
                         if self.frame_id <= 10 and self.final_score_frame <= 300:
                             # We are in frame 10 and we have a strike!
-                            if self.frame_id == 10 and self.cases[inputValues[s]] == 10:
-                                self.strike_frame_10(inputValues, s, inputLength)
+                            if self.frame_id == 10 and self.cases[inputValues[idx]] == 10:
+                                self.strike_frame_10(inputValues, idx, inputLength)
                             # We have a strike!
-                            elif self.cases[inputValues[s]] == 10:
-                                self.strike(inputValues, s, inputLength)
+                            elif self.cases[inputValues[idx]] == 10:
+                                self.strike(inputValues, idx, inputLength)
                             # We have a miss!
-                            elif self.cases[inputValues[s]] == 0:
-                                self.miss(inputValues, s, inputLength)
+                            elif self.cases[inputValues[idx]] == 0:
+                                self.miss(inputValues, idx, inputLength)
                             else:
-                                self.score(inputValues, s, inputLength)
+                                self.score(inputValues, idx, inputLength)
                                 
                     return self.table_content
                 except IndexError as e:
