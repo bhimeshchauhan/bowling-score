@@ -98,7 +98,9 @@ class Bowling(object):
         except IOError:
             logging.exception('')
         if not data:
-            raise ValueError('No data available')
+            raise IOError('No data available')
+        if len(self.score_data) == 0:
+            raise ValueError('No data in the file')
 
     def calculate_score(self):
         """
@@ -206,10 +208,10 @@ class Bowling(object):
                     # If he can't calculate the Bonus values means the game is not finished.
                     return self.table_content
             else:
-                print( instructions())
+                print(self.instructions())
 
         except KeyError:
-            print( instructions())
+            print(self.instructions())
 
         return None
 

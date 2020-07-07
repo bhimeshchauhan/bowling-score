@@ -11,9 +11,9 @@ import pytest
 
 def test_no_file():
     """
-        should throw ValueError when no file is present 
+        should throw IOError when no file is present 
     """
-    with pytest.raises(ValueError):
+    with pytest.raises(IOError):
         Bowling().read_csv(filename = 'incorrectfile.csv')
 
 def test_data_extraction():
@@ -60,3 +60,11 @@ def test_spare_calculation():
     result  = game.calculate_score()
     assert game.table_content == assert_data
     assert game.final_score_frame == assert_score
+
+
+def test_empty_calculation():
+    """
+        should raise error for value not present in the file
+    """
+    with pytest.raises(ValueError):
+        Bowling().read_csv(filename = '../data/test_empty.csv')
