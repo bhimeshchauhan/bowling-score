@@ -25,7 +25,15 @@ Bowling
 
 #### Run via CLI
 
-- migrate to python file and run python python bowling.py <filepath> for e.g. `python bowling.py ../data/test.csv`
+- go to python folder and run `pip install -r requirements.txt`
+- run `source env/bin/activate`
+- go to python folder and run `python bowling.py <filepath>` for e.g. `python bowling.py ../data/data.csv`
+
+#### Run test
+
+- go to python folder and run `pip install -r requirements.txt`
+- run `source env/bin/activate`
+- run `pytest`
 
 ### Application in React.JS and Django
 

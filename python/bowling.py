@@ -8,6 +8,48 @@ import csv
 import logging
 
 class Bowling(object):
+    """
+    A class used to represent bowling games
+    ...
+
+    Attributes
+    ----------
+    cases : dict
+        a tally dictionary that converts from string to integer for score calculations.
+    table_content : dict
+        main storage for the scores
+    frame_id : int
+        current frame for the game
+    final_score_frame : int
+        final score at each frame
+    score_data : int
+        final score data, assemebles all the game data to be printed out
+
+    Methods
+    -------
+    instructions()
+        Prints the instruction for users to use the program
+    read_csv()
+        Read the csv data
+    calculate_score()
+        Calculate the score
+    strike_frame_10()
+        Calculate if strike frame is last frame
+    strike()
+        Calculate strike
+    miss()
+        Calculate when it's a miss
+    partial_hit()
+        Calculate the partial hits
+    spare()
+        Calculate spare
+    score()
+        Calculate total score
+    bowling_game()
+        Process each bowling game from the file
+    print_table()
+        Prints the bowling score chart in the CLI
+    """
     def __init__(self):
         self.cases = {
             'X' : 10,
@@ -25,10 +67,10 @@ class Bowling(object):
             '9' : 9,
             '10': 10
         }
-        self.tableContent = dict().fromkeys([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-        self.frameID = 1 			# Frame counter
-        self.finalScoreFrame = 0		# Final Score
-
+        self.table_content = dict().fromkeys([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+        self.frame_id = 1 			# Frame counter
+        self.final_score_frame = 0		# Final Score
+        self.score_data = []
 
     def instructions(self):
         message = ("""--------------------------------------------------------------------------\n"""
@@ -37,7 +79,7 @@ class Bowling(object):
                     """--------------------------------------------------------------------------""")
         return message
 
-    def read_csv(self, filename=sys.argv[1]):
+    def read_csv(self, filename):
         """ 
             Read CSV file from remote path.
             Args: filename(str): filename to read.
@@ -45,22 +87,29 @@ class Bowling(object):
             Raises: ValueError: Unable to read file
         """
         data = None
-        count = 0
         try:
             with open(filename) as csv_file:
                 data = csv.reader(csv_file, delimiter=',')
                 for row in data:
-                    count += 1
-                    self.bowling_game(list(map(str.strip, row)))
-                    self.print_table(count)
+                    self.score_data.append(list(map(str.strip, row)))      
         except IOError:
             logging.exception('')
         if not data:
             raise ValueError('No data available')
 
+    def calculate_score(self):
+        """
+            Calculate scores
+        """
+        count = 0
+        for score_board in self.score_data:
+            count += 1
+            self.bowling_game(score_board)
+            self.print_table(count)
+
     def strike_frame_10(self, inputValues, s, inputLength):
         if (s+2 < inputLength):
-            self.finalScoreFrame += self.cases[inputValues[s]] + self.cases[inputValues[s+1]] + self.cases[inputValues[s+2]]
+            self.final_score_frame += self.cases[inputValues[s]] + self.cases[inputValues[s+1]] + self.cases[inputValues[s+2]]
             if (inputValues[s+1] == '10'):
                 score1 = 'X'
             else:
@@ -69,56 +118,55 @@ class Bowling(object):
                 score2 = 'X'
             else:
                 score2 = inputValues[s+2]
-            self.tableContent[self.frameID]=('X', score1, score2, self.finalScoreFrame)
-            self.frameID += 1
+            self.table_content[self.frame_id]=('X', score1, score2, self.final_score_frame)
+            self.frame_id += 1
         else:
-            self.tableContent[self.frameID]=('X', '', '', self.finalScoreFrame)
-            self.frameID += 1
+            self.table_content[self.frame_id]=('X', '', '', self.final_score_frame)
+            self.frame_id += 1
 
     def strike(self, inputValues, s, inputLength):
-        self.tableContent[self.frameID]=('X', ' ', ' ', self.finalScoreFrame)
+        self.table_content[self.frame_id]=('X', ' ', ' ', self.final_score_frame)
         if (s+2 < inputLength):
-            self.finalScoreFrame += self.cases[inputValues[s]] + self.cases[inputValues[s+1]] + self.cases[inputValues[s+2]]
-            self.tableContent[self.frameID]=('X', ' ', ' ', self.finalScoreFrame)
-            self.frameID += 1
+            self.final_score_frame += self.cases[inputValues[s]] + self.cases[inputValues[s+1]] + self.cases[inputValues[s+2]]
+            self.table_content[self.frame_id]=('X', ' ', ' ', self.final_score_frame)
+            self.frame_id += 1
         else:
-            self.tableContent[self.frameID]=('X', ' ', ' ', self.finalScoreFrame)
-            self.frameID += 1
+            self.table_content[self.frame_id]=('X', ' ', ' ', self.final_score_frame)
+            self.frame_id += 1
         
     def miss(self, inputValues, s, inputLength):
         # This means that this is the first throw of this frame
-        if self.tableContent[self.frameID] == None:
-            self.tableContent[self.frameID]=(self.cases[inputValues[s]], ' ', ' ', self.finalScoreFrame)
+        if self.table_content[self.frame_id] == None:
+            self.table_content[self.frame_id]=(self.cases[inputValues[s]], ' ', ' ', self.final_score_frame)
 
         else:
-            self.finalScoreFrame += self.cases[inputValues[s-1]] + self.cases[inputValues[s]]
-            tableContent[frameID]=(self.cases[inputValues[s-1]], self.cases[inputValues[s]], ' ', self.finalScoreFrame)
-            self.frameID += 1
+            self.final_score_frame += self.cases[inputValues[s-1]] + self.cases[inputValues[s]]
+            self.table_content[frame_id]=(self.cases[inputValues[s-1]], self.cases[inputValues[s]], ' ', self.final_score_frame)
+            self.frame_id += 1
 
     def partial_hit(self, inputValues, s, inputLength):
-        self.tableContent[self.frameID]=(self.cases[inputValues[s]], ' ', ' ', self.finalScoreFrame)
+        self.table_content[self.frame_id]=(self.cases[inputValues[s]], ' ', ' ', self.final_score_frame)
 
     def spare(self, inputValues, s, inputLength):
         if self.cases[inputValues[s-1]] + self.cases[inputValues[s]] == 10:
-            self.finalScoreFrame += self.cases[inputValues[s-1]] + self.cases[inputValues[s]] + self.cases[inputValues[s+1]]
-            self.tableContent[self.frameID]=(self.cases[inputValues[s-1]], '/', ' ', self.finalScoreFrame)
-            self.frameID += 1
+            self.final_score_frame += self.cases[inputValues[s-1]] + self.cases[inputValues[s]] + self.cases[inputValues[s+1]]
+            self.table_content[self.frame_id]=(self.cases[inputValues[s-1]], '/', ' ', self.final_score_frame)
+            self.frame_id += 1
         elif self.cases[inputValues[s-1]] + self.cases[inputValues[s]] > 10:
-            print "Error: Looks like we have an extra pin in the roll, sorry!"
+            print( "Error: Looks like we have an extra pin in the roll, sorry!")
         else:
-            self.finalScoreFrame += self.cases[inputValues[s-1]] + self.cases[inputValues[s]]
-            self.tableContent[self.frameID]=(self.cases[inputValues[s-1]], self.cases[inputValues[s]], ' ', self.finalScoreFrame)
-            self.frameID += 1
+            self.final_score_frame += self.cases[inputValues[s-1]] + self.cases[inputValues[s]]
+            self.table_content[self.frame_id]=(self.cases[inputValues[s-1]], self.cases[inputValues[s]], ' ', self.final_score_frame)
+            self.frame_id += 1
 
     def score(self, inputValues, s, inputLength):
         # This means that this is the first throw of this frame
-        if self.tableContent[self.frameID] == None:
+        if self.table_content[self.frame_id] == None:
             self.partial_hit(inputValues, s, inputLength)
 
         else:
             # We have a spare!
             self.spare(inputValues, s, inputLength)
-            
 
     def bowling_game(self, inputValues):
         # Read all the arguments after bowling-scoreboard.py <numbers>
@@ -126,20 +174,20 @@ class Bowling(object):
         try:
 
             # Let the game start!!
-            self.frameID = 1 			# Frame counter
-            self.finalScoreFrame = 0		# Final Score
+            self.frame_id = 1 			# Frame counter
+            self.final_score_frame = 0		# Final Score
 
             # # Add the frame keys
-            self.tableContent = dict().fromkeys([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+            self.table_content = dict().fromkeys([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 
             # Then we have a game
             if inputLength > 0:
                 try:
                     for s in range(0, inputLength):
                         # We are under the limits of the game.
-                        if self.frameID <= 10 and self.finalScoreFrame <= 300:
+                        if self.frame_id <= 10 and self.final_score_frame <= 300:
                             # We are in frame 10 and we have a strike!
-                            if self.frameID == 10 and self.cases[inputValues[s]] == 10:
+                            if self.frame_id == 10 and self.cases[inputValues[s]] == 10:
                                 self.strike_frame_10(inputValues, s, inputLength)
                             # We have a strike!
                             elif self.cases[inputValues[s]] == 10:
@@ -150,43 +198,45 @@ class Bowling(object):
                             else:
                                 self.score(inputValues, s, inputLength)
                                 
-                    return self.tableContent
+                    return self.table_content
                 except IndexError as e:
                     # If he can't calculate the Bonus values means the game is not finished.
-                    return self.tableContent
+                    return self.table_content
             else:
-                print instructions()
+                print( instructions())
 
         except KeyError:
-            print instructions()
+            print( instructions())
 
         return None
 
     def print_table(self, count):
         try:
             # Print the table
-            print ""
-            print "----------------------------------------------------------------------------------------------------------------"
-            print "{:>57} - {:<37}".format("Bowling Game", count)
-            print "----------------------------------------------------------------------------------------------------------------"
-            print "{:^7} | {:^7} | {:^7} | {:^7} | {:^7} | {:^7} | {:^7} | {:^7} | {:^7} | {:^11} | {:^8}".format('F1','F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'Score')
-            print "----------------------------------------------------------------------------------------------------------------"
-            for k,v in self.tableContent.iteritems():
+            print( "")
+            print( "----------------------------------------------------------------------------------------------------------------")
+            print( "{:>57} - {:<37}".format("Bowling Game", count))
+            print( "----------------------------------------------------------------------------------------------------------------")
+            print( "{:^7} | {:^7} | {:^7} | {:^7} | {:^7} | {:^7} | {:^7} | {:^7} | {:^7} | {:^11} | {:^8}".format('F1','F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'Score'))
+            print( "----------------------------------------------------------------------------------------------------------------")
+            for k,v in self.table_content.items():
                 if v  == None:
                     r1, r2, r3, total = ('-', '-', '-', '-')
                 else:
                     r1, r2, r3, total = v
                     score = total
-                if k < len(self.tableContent):
-                    print "{:^3} {:^3} |".format(r1, r2),
+                if k < len(self.table_content):
+                    print( "{:^3} {:^3} |".format(r1, r2), end =" ")
                 else:
-                    print "{:^3} {:^3} {:^3} | {:^7} ".format(r1, r2, r3, score)
-            print "----------------------------------------------------------------------------------------------------------------"
-            print ""
+                    print( "{:^3} {:^3} {:^3} | {:^7} ".format(r1, r2, r3, score), end =" ")
+            print( "\n----------------------------------------------------------------------------------------------------------------")
+            print( "")
 
         except TypeError:
             # "Can't" handle the 'X', '/' symbols."
             pass
 
 if __name__ == '__main__':
-	Bowling().read_csv()
+    game = Bowling()
+    game.read_csv(sys.argv[1])
+    game.calculate_score() 
