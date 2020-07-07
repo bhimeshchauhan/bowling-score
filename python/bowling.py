@@ -24,6 +24,8 @@ class Bowling(object):
         final score at each frame
     score_data : int
         final score data, assemebles all the game data to be printed out
+    input_length : int
+        length of each line of scoreboard from file
 
     Methods
     -------
@@ -70,6 +72,7 @@ class Bowling(object):
         self.table_content = dict().fromkeys([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
         self.frame_id = 1 			# Frame counter
         self.final_score_frame = 0		# Final Score
+        self.input_length = 0
         self.score_data = []
 
     def instructions(self):
@@ -107,70 +110,70 @@ class Bowling(object):
             self.bowling_game(score_board)
             self.print_table(count)
 
-    def strike_frame_10(self, inputValues, idx, inputLength):
-        if (idx+2 < inputLength):
-            self.final_score_frame += self.cases[inputValues[idx]] + self.cases[inputValues[idx+1]] + self.cases[inputValues[idx+2]]
-            if (inputValues[idx+1] == '10'):
+    def strike_frame_10(self, input_values, idx):
+        if (idx+2 < self.input_length):
+            self.final_score_frame += self.cases[input_values[idx]] + self.cases[input_values[idx+1]] + self.cases[input_values[idx+2]]
+            if (input_values[idx+1] == '10'):
                 score1 = 'X'
             else:
-                score1 = inputValues[idx+1]
-            if (inputValues[idx+2] == '10'):
+                score1 = input_values[idx+1]
+            if (input_values[idx+2] == '10'):
                 score2 = 'X'
             else:
-                score2 = inputValues[idx+2]
+                score2 = input_values[idx+2]
             self.table_content[self.frame_id]=('X', score1, score2, self.final_score_frame)
             self.frame_id += 1
         else:
             self.table_content[self.frame_id]=('X', '', '', self.final_score_frame)
             self.frame_id += 1
 
-    def strike(self, inputValues, idx, inputLength):
+    def strike(self, input_values, idx):
         self.table_content[self.frame_id]=('X', ' ', ' ', self.final_score_frame)
-        if (idx+2 < inputLength):
-            self.final_score_frame += self.cases[inputValues[idx]] + self.cases[inputValues[idx+1]] + self.cases[inputValues[idx+2]]
+        if (idx+2 < self.input_length):
+            self.final_score_frame += self.cases[input_values[idx]] + self.cases[input_values[idx+1]] + self.cases[input_values[idx+2]]
             self.table_content[self.frame_id]=('X', ' ', ' ', self.final_score_frame)
             self.frame_id += 1
         else:
             self.table_content[self.frame_id]=('X', ' ', ' ', self.final_score_frame)
             self.frame_id += 1
         
-    def miss(self, inputValues, idx, inputLength):
+    def miss(self, input_values, idx):
         # This means that this is the first throw of this frame
         if self.table_content[self.frame_id] == None:
-            self.table_content[self.frame_id]=(self.cases[inputValues[idx]], ' ', ' ', self.final_score_frame)
+            self.table_content[self.frame_id]=(self.cases[input_values[idx]], ' ', ' ', self.final_score_frame)
 
         else:
-            self.final_score_frame += self.cases[inputValues[idx-1]] + self.cases[inputValues[idx]]
-            self.table_content[frame_id]=(self.cases[inputValues[idx-1]], self.cases[inputValues[idx]], ' ', self.final_score_frame)
+            self.final_score_frame += self.cases[input_values[idx-1]] + self.cases[input_values[idx]]
+            self.table_content[frame_id]=(self.cases[input_values[idx-1]], self.cases[input_values[idx]], ' ', self.final_score_frame)
             self.frame_id += 1
 
-    def partial_hit(self, inputValues, idx, inputLength):
-        self.table_content[self.frame_id]=(self.cases[inputValues[idx]], ' ', ' ', self.final_score_frame)
+    def partial_hit(self, input_values, idx):
+        self.table_content[self.frame_id]=(self.cases[input_values[idx]], ' ', ' ', self.final_score_frame)
 
-    def spare(self, inputValues, idx, inputLength):
-        if self.cases[inputValues[idx-1]] + self.cases[inputValues[idx]] == 10:
-            self.final_score_frame += self.cases[inputValues[idx-1]] + self.cases[inputValues[idx]] + self.cases[inputValues[idx+1]]
-            self.table_content[self.frame_id]=(self.cases[inputValues[idx-1]], '/', ' ', self.final_score_frame)
+    def spare(self, input_values, idx):
+        if self.cases[input_values[idx-1]] + self.cases[input_values[idx]] == 10:
+            self.final_score_frame += self.cases[input_values[idx-1]] + self.cases[input_values[idx]] + self.cases[input_values[idx+1]]
+            self.table_content[self.frame_id]=(self.cases[input_values[idx-1]], '/', ' ', self.final_score_frame)
             self.frame_id += 1
-        elif self.cases[inputValues[idx-1]] + self.cases[inputValues[idx]] > 10:
+        elif self.cases[input_values[idx-1]] + self.cases[input_values[idx]] > 10:
             print( "Error: Looks like we have an extra pin in the roll, sorry!")
         else:
-            self.final_score_frame += self.cases[inputValues[idx-1]] + self.cases[inputValues[idx]]
-            self.table_content[self.frame_id]=(self.cases[inputValues[idx-1]], self.cases[inputValues[idx]], ' ', self.final_score_frame)
+            self.final_score_frame += self.cases[input_values[idx-1]] + self.cases[input_values[idx]]
+            self.table_content[self.frame_id]=(self.cases[input_values[idx-1]], self.cases[input_values[idx]], ' ', self.final_score_frame)
             self.frame_id += 1
 
-    def score(self, inputValues, idx, inputLength):
+    def score(self, input_values, idx):
         # This means that this is the first throw of this frame
         if self.table_content[self.frame_id] == None:
-            self.partial_hit(inputValues, idx, inputLength)
+            self.partial_hit(input_values, idx)
 
         else:
             # We have a spare!
-            self.spare(inputValues, idx, inputLength)
+            self.spare(input_values, idx)
 
-    def bowling_game(self, inputValues):
+    def bowling_game(self, input_values):
         # Read all the arguments after bowling-scoreboard.py <numbers>
-        inputLength = len(inputValues)
+        self.input_length = len(input_values)
         try:
 
             # Let the game start!!
@@ -181,22 +184,22 @@ class Bowling(object):
             self.table_content = dict().fromkeys([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 
             # Then we have a game
-            if inputLength > 0:
+            if self.input_length > 0:
                 try:
-                    for idx in range(0, inputLength):
+                    for idx in range(0, self.input_length):
                         # We are under the limits of the game.
                         if self.frame_id <= 10 and self.final_score_frame <= 300:
                             # We are in frame 10 and we have a strike!
-                            if self.frame_id == 10 and self.cases[inputValues[idx]] == 10:
-                                self.strike_frame_10(inputValues, idx, inputLength)
+                            if self.frame_id == 10 and self.cases[input_values[idx]] == 10:
+                                self.strike_frame_10(input_values, idx)
                             # We have a strike!
-                            elif self.cases[inputValues[idx]] == 10:
-                                self.strike(inputValues, idx, inputLength)
+                            elif self.cases[input_values[idx]] == 10:
+                                self.strike(input_values, idx)
                             # We have a miss!
-                            elif self.cases[inputValues[idx]] == 0:
-                                self.miss(inputValues, idx, inputLength)
+                            elif self.cases[input_values[idx]] == 0:
+                                self.miss(input_values, idx)
                             else:
-                                self.score(inputValues, idx, inputLength)
+                                self.score(input_values, idx)
                                 
                     return self.table_content
                 except IndexError as e:
