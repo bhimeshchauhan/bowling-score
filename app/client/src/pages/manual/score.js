@@ -30,7 +30,6 @@ function Score() {
             data: scorePanel
         }
         axios.post(apiurl, payload).then((response) => {
-            console.log(response);
             if(response.status === 200) {
                 let result = response.data.result[0];
                 Object.keys(result).forEach(idx => {

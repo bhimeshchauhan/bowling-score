@@ -26,9 +26,6 @@ Bowling
 ##### Run
 - run `cd app/client`
 - run `npm run`
-##### Test
-- run `cd app/client`
-- run `npm test`
 
 #### Server - @access [http://localhost:8000/]
 
@@ -39,8 +36,11 @@ Bowling
 ##### Run
 - run `cd app/server`
 - run `source env/bin/activate`
+- run `python manage.py migrate`
 - run `pip install -r requirements.txt`
 - run `python manage.py runserver`
-##### Test
-- run `cd app/server`
-- run `django test`
+
+### Access App : `http://localhost:3000/`
+
+### Preview
+[![Watch the video](./demo.gif)]
