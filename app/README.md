@@ -43,4 +43,4 @@ Bowling
 ### Access App : `http://localhost:3000/`
 
 ### Preview
-[![Watch the video](./demo.gif)]
+![Watch the video](./demo.gif)
